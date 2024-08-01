@@ -1,0 +1,31 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+{{ post.title }}
+{% endblock title %}
+
+{% block content %}
+<div class="content">
+    <div class="ad-detail">
+        <h1>{{ post.title }} | Заголовок объявления</h1>
+        <p>{{ post.content }} | Подробное содержание объявления...</p>
+        <p>{{ post.date_add|date:'M d Y' }} | Date</p>
+        <p>Категория публикации: {{ post.category }}</p>
+        {#<p>{{ post. }} | Кол-во откликов</p>#}
+        <form action="/reply" method="post">
+            <textarea name="reply" placeholder="Напишите ваш отклик" required></textarea>
+            <button type="submit">Отправить отклик</button>
+        </form>
+    </div>
+</div>
+
+
+<tr>
+    {# Если пользователь - автор#}
+   <td><a href="{{ post.id }}/delete">delete</a></td>
+   <td><a href="{{ post.id }}/edit">update</a></td>
+    
+   <td><a href="/news/">back</a></td>
+</tr>
+{% endblock content %}
+

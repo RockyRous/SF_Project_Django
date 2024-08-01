@@ -1,0 +1,42 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<div class="content">
+    <div class="form-box">
+        <h1>Создать объявление</h1>
+        <form action="/create-ad" method="post">
+            <input type="text" name="title" placeholder="Заголовок" required>
+            <textarea name="content" placeholder="Содержание" required></textarea>
+            <select name="category" required>
+                <option value="">Выберите категорию</option>
+                <option value="tank">Танки</option>
+                <option value="healer">Хилы</option>
+                <option value="dd">ДД</option>
+                <option value="merchant">Торговцы</option>
+                <option value="guildmaster">Гилдмастеры</option>
+                <option value="questgiver">Квестгиверы</option>
+                <option value="blacksmith">Кузнецы</option>
+                <option value="leatherworker">Кожевники</option>
+                <option value="potionmaker">Зельевары</option>
+                <option value="spellmaster">Мастера заклинаний</option>
+            </select>
+            <button type="submit">Создать</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+
+{#{% load my_filters %}#}
+{##}
+{#<h1>Добавление\изменение записи</h1>#}
+{#<hr>#}
+{#<form action="" method="post">#}
+{#    {% csrf_token %}#}
+{#    {{ form.as_p }}#}
+{#    <input type="submit" value="Добавить" />#}
+{#</form>#}
+{#<hr>#}
+{#<tr>#}
+{#   <td><a href="/news/{{ object.id }}">back</a></td>#}
+{#</tr>#}
