@@ -6,18 +6,28 @@ from django.contrib.auth.models import User
 from django import forms
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
+from django.utils import timezone
+
+
+class EmailConfirmation(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    confirmation_code = models.CharField(max_length=6)
+    expiration_time = models.DateTimeField()
+
+    def is_valid(self):
+        return timezone.now() < self.expiration_time
 
 
 class BaseRegisterForm(UserCreationForm):
     email = forms.EmailField(label = "Email")
-    first_name = forms.CharField(label = "Имя")
-    last_name = forms.CharField(label = "Фамилия")
+    # first_name = forms.CharField(label = "Имя")
+    # last_name = forms.CharField(label = "Фамилия")
 
     class Meta:
         model = User
         fields = ("username",
-                  "first_name",
-                  "last_name",
+                  # "first_name",
+                  # "last_name",
                   "email",
                   "password1",
                   "password2", )

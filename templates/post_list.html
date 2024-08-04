@@ -7,46 +7,24 @@
 {% block content %}
 <div class="content">
 
-    <div class="ads-list">
-        <div class="ad-item">
-            <h2><a href="/ad/1">Заголовок объявления 1</a></h2>
-            <p>Содержание объявления...</p>
-            <button>Посмотреть</button>
-            <button>Откликнуться</button>
-            <span>Откликов: 3</span>
+    {% if post %}
+    
+        <div class="ads-list">
+            {% for one_post in post %}
+                
+                
+                <div class="ad-item">
+                    <h2><a href="{{ one_post.id }}">{{ one_post.title }}</a></h2>
+                    <p>{{ one_post.content }}</p>
+                    <button>Посмотреть</button>
+                    <button>Откликнуться</button>
+                    <span>Откликов: 3</span>
+                </div>
+                
+                
+            {% endfor %}
         </div>
-        <!-- Add more ad-items as needed -->
-
-        <div class="ad-item">
-            <h2><a href="/ad/1">Заголовок объявления 2</a></h2>
-            <p>Содержание объявления...</p>
-            <button>Посмотреть</button>
-            <button>Откликнуться</button>
-            <span>Откликов: 0</span>
-        </div>
-        <!-- Add more ad-items as needed -->
-    </div>
-
-{#    <!--Пагинация-->#}
-{#   {% if page_obj.has_previous %}#}
-{#       <a href="?{% url_replace page=1 %}">1</a>#}
-{#       {% if page_obj.previous_page_number != 1 %}#}
-{#           ...#}
-{#           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>#}
-{#       {% endif %}#}
-{#   {% endif %}#}
-{##}
-   {# Информация о текущей странице #}
-{#   {{ page_obj.number }}#}
-{##}
-   {# Информация о следующих страницах #}
-{#   {% if page_obj.has_next %}#}
-{#       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>#}
-{#       {% if paginator.num_pages != page_obj.next_page_number %}#}
-{#           ...#}
-{#           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>#}
-{#       {% endif %}#}
-{#   {% endif %}#}
+    {% endif %}
 
 </div>
 {% endblock content %}

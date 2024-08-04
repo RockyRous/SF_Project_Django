@@ -14,18 +14,20 @@
         <nav>
             <ul>
                 <li><a href="{% url 'post_list' %}">Главная</a></li>
-                <li><a href="create_post/">Добавить объявление</a></li>
-                <li><a href="my-ads">Мои объявления (Пока не работает)</a></li>
-                {# Если не авторизован #}
-                <li><a href="{% url 'login' %}">Авторизоваться</a></li>
-                <li><a href="{% url 'signup' %}">Зарегистрироваться</a></li>
-                {# Если Уже авторизован #}
-                <li><a href="{% url 'logout' %}">Выйти</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'post_edit' %}">Добавить объявление</a></li>
+                    <li><a href="{% url 'my_post_list' %}">Мои объявления</a></li>
+                    <li><a href="{% url 'logout' %}">Выйти</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Авторизоваться</a></li>
+                    <li><a href="{% url 'signup' %}">Зарегистрироваться</a></li>
+                {% endif %}
             </ul>
         </nav>
     </header>
     
     {% block content %}{% endblock content %}
+
     
 </body>
 </html>

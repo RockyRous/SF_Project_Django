@@ -6,9 +6,27 @@ class Post(models.Model):
     """ Обьявления """
     # При создании автор должен автоматически выставляться на пользователя. Полагаю это делается во вьёшке.
 
-    heal = 'heal'
+    tank = 'Танк'
+    heal = 'Хил'
+    dd = 'ДД'
+    merchants = 'Торговцы'
+    guildmasters = 'Гильдмастеры'
+    questgivers = 'Квестгиверы'
+    blacksmiths = 'Кузнецы'
+    tanners = 'Кожевники'
+    potion_makers = 'Зельевары'
+    spell_masters = 'Мастера Заклинаний'
     category_list = [
+        (tank, 'Танк'),
         (heal, 'Хил'),
+        (dd, 'ДД'),
+        (merchants, 'Торговцы'),
+        (guildmasters, 'Гильдмастеры'),
+        (questgivers, 'Квестгиверы'),
+        (blacksmiths, 'Кузнецы'),
+        (tanners, 'Кожевники'),
+        (potion_makers, 'Зельевары'),
+        (spell_masters, 'Мастера Заклинаний'),
     ]
 
     title = models.CharField(max_length=255)
