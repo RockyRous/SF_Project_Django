@@ -2,21 +2,13 @@ import random
 import string
 
 from django.template.loader import render_to_string
+from django.shortcuts import render, redirect
+from django.core.mail import EmailMultiAlternatives
+from django.utils import timezone
+from django.contrib.auth import login, get_backends, logout
 
 from .forms import SignUpForm, ConfirmationForm
 from .models import EmailConfirmation
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.core.mail import send_mail, EmailMultiAlternatives
-from django.utils import timezone
-from django.contrib.auth import login, logout
-# from django.contrib.auth.models import Group
-# from django.contrib.auth.decorators import login_required
-# from django.views.generic.edit import CreateView
-# from .models import BaseRegisterForm
-
-from django.contrib.auth import login, get_backends, load_backend
 
 
 def generate_confirmation_code():
@@ -49,17 +41,9 @@ def signup_view(request):
                 from_email='django.emailsender@yandex.ru',
                 to=[user.email],
             )
-            msg.attach_alternative(html_content, "text/html")  # добавляем html
+            msg.attach_alternative(html_content, "text/html")
             print(f'DEBUG: Sended email - {user.email}')
-            msg.send()  # отсылаем
-
-            # send_mail(
-            # 'Your confirmation code',
-            # f'Your confirmation code is {confirmation_code}',
-            # 'django.emailsender@yandex.ru',
-            # [user.email],
-            # fail_silently=False,
-            # )
+            msg.send()
 
             return redirect('confirm_email')
     else:
@@ -97,17 +81,3 @@ def confirm_email_view(request):
 def logout_view(request):
     logout(request)
     return render(request, 'sign/logout.html')
-
-# class BaseRegisterView(CreateView):
-#     model = User  # модель формы, которую реализует данный дженерик;
-#     form_class = BaseRegisterForm  # форма, которая будет заполняться пользователем;
-#     success_url = '/'  # URL, на который нужно направить пользователя после успешного ввода данных в форму.
-
-
-# @login_required
-# def upgrade_me(request):
-#     user = request.user
-#     authors_group = Group.objects.get(name='authors')
-#     if not request.user.groups.filter(name='authors').exists():
-#         authors_group.user_set.add(user)
-#     return redirect('/')

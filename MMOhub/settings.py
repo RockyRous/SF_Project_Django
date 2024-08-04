@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
+from .config import SECRET_KEY_DJANGO, EMAIL_USER, EMAIL_PASSWORD, sender_mail
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = ['127.0.0.1']
-
-SECRET_KEY = 'django-insecure-t-!p@rp218$wh2r*s=+z3h3e&!wamadf7%gaw94v3ja-05if##'
+SECRET_KEY = SECRET_KEY_DJANGO
 DEBUG = True
 
 SITE_ID = 1
@@ -14,13 +14,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+ROOT_URLCONF = 'MMOhub.urls'
+WSGI_APPLICATION = 'MMOhub.wsgi.application'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,7 +51,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-ROOT_URLCONF = 'MMOhub.urls'
+
 
 TEMPLATES = [
     {
@@ -73,23 +69,22 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'MMOhub.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-CKEDITOR_UPLOAD_PATH = 'uploads/'
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
 
+CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -100,7 +95,6 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # (тру) позволит избежать дополнительных действий и активирует аккаунт сразу, как только мы перейдём по ссылке
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1  # количество дней, в течение которых будет доступна ссылка на подтверждение регистрации и т. д.
-# ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -123,32 +117,10 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SOCIALACCOUNT_AUTO_SIGNUP = False
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
-        'APP': {
-            'client_id': 'config.CLIENT_ID',
-            'secret': 'config.SECRET',
-            'key': ''
-        }
-    }
-}
-
-# Email
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Это позволит выводить письма в консоль, а не отправлять их. Если письма появляются в консоли, то проблема может быть связана с настройками SMTP
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'  # Сохраняет в файл
-# EMAIL_FILE_PATH = '/tmp'  # Директория для хранения писем
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'  # адрес сервера Яндекс-почты для всех один и тот же
-EMAIL_PORT = 465  # порт smtp сервера тоже одинаковый
-EMAIL_HOST_USER = 'django.emailsender'  # ваше имя пользователя, например, если ваша почта user@yandex.ru, то сюда надо писать user, иными словами, это всё то что идёт до собаки
-EMAIL_HOST_PASSWORD = 'laszsdjmhkuoscoe'  # пароль от приложения
-EMAIL_USE_SSL = True  # Яндекс использует ssl, подробнее о том, что это, почитайте в дополнительных источниках, но включать его здесь обязательно
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + '@yandex.ru'  # здесь указываем уже свою ПОЛНУЮ почту, с которой будут отправляться письма
-
-
-
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = EMAIL_USER
+EMAIL_HOST_PASSWORD = EMAIL_PASSWORD
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = sender_mail

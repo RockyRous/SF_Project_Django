@@ -1,23 +1,19 @@
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.html import strip_tags
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.core.mail import EmailMultiAlternatives  # класс для создание объекта письма с html
-from django.template.loader import render_to_string  # функция, которая рендерит наш html в текст
+from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
-from .models import Post, Reply, Newsletter
-from .filters import PostFilter
-from .forms import PostForm, ReplyForm, NewsletterForm
-from django.utils.html import strip_tags
 from django.core.mail import send_mail
-from django.contrib.admin.views.decorators import staff_member_required
 
+from .models import Post, Reply
+from .forms import PostForm, ReplyForm, NewsletterForm
+
+from MMOhub.config import sender_mail
 
 
 def send_notification(post_author_email, post, reply_author_name):
@@ -27,30 +23,8 @@ def send_notification(post_author_email, post, reply_author_name):
         'reply_author_name': reply_author_name,
     })
     plain_message = strip_tags(html_message)
-    from_email = 'django.emailsender@yandex.ru'
+    from_email = sender_mail
     send_mail(subject, plain_message, from_email, [post_author_email], html_message=html_message)
-
-#     """ Рассылка на почту """
-#     for user in subscribers:
-#         # Получаем наш html с учетом пользователя
-#         html_content = render_to_string(
-#             'email_post_created.html',
-#             {
-#                 'post': post,
-#                 'user': user,
-#             }
-#         )
-#
-#         # Отправка письма
-#         msg = EmailMultiAlternatives(
-#             subject=f'{post.title} | {post.date_add.strftime("%Y-%m-%d")}',
-#             body=post.text,
-#             from_email='django.emailsender@yandex.ru',
-#             to=[user.email],
-#         )
-#         msg.attach_alternative(html_content, "text/html")  # добавляем html
-#         print(f'DEBUG: Sended email - {user.email}')
-#         msg.send()  # отсылаем
 
 
 class PostList(ListView):
@@ -87,7 +61,6 @@ class UserPostList(LoginRequiredMixin, ListView):
     ordering = '-date_add'
     template_name = 'post_list.html'
     context_object_name = 'post'
-    # paginate_by = 10
 
     def get_queryset(self):
         return Post.objects.filter(author=self.request.user).annotate(reply_count=Count('reply'))
@@ -114,22 +87,6 @@ class PostCreate(LoginRequiredMixin, CreateView):
         post = form.save(commit=False)
         post.author = self.request.user
         post.save()
-
-        # Сохраняем категории через промежуточную модель PostCategory
-        # categories = form.cleaned_data['category']
-        # for category in categories:
-        #     PostCategory.objects.create(post=post, category=category)
-
-        # Отправка уведомлений
-        # Собираем все email подписчиков
-        # subscribers = set()
-        # for category in post.category.all():
-        #     for user in category.subscribers.all():
-        #         subscribers.add(user)
-
-        # Отправка писем каждому подписчику
-        # send_post_notification(post, subscribers)
-
         return super().form_valid(form)
 
 
@@ -137,7 +94,6 @@ class ReplyCreate(LoginRequiredMixin, CreateView):
     form_class = ReplyForm
     model = Reply
     template_name = 'post_detail.html'
-    # success_url = reverse_lazy('post_list')
 
     def form_valid(self, form):
         reply = form.save(commit=False)
@@ -192,7 +148,7 @@ class ReplyAccept(View):
             'reply_title': reply.title,
         })
         plain_message = strip_tags(html_message)
-        from_email = 'django.emailsender@yandex.ru'
+        from_email = sender_mail
         send_mail(subject, plain_message, from_email, [reply.author.email], html_message=html_message)
 
 
@@ -211,7 +167,7 @@ def create_newsletter(request):
             send_mail(
                 subject=newsletter.subject,
                 message=newsletter.body,
-                from_email='django.emailsender@yandex.ru',
+                from_email=sender_mail,
                 recipient_list=recipient_list,
             )
 

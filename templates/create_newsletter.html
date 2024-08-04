@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Создать новостную рассылку</title>
-</head>
-<body>
-    <h1>Создать новостную рассылку</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Отправить рассылку</button>
-    </form>
-</body>
-</html>
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<div class="content">
+    <div class="form-box">
+        <h1>Создать новостную рассылку</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Отправить рассылку</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

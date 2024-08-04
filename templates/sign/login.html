@@ -9,10 +9,6 @@
             
             <form method="post" action="{% url 'login' %}">
                 {% csrf_token %}
-                {# Надо сделать так - так красивее #}
-{#                <input type="email" name="email" placeholder="Email" required>#}
-{#                <input type="text" name="code" placeholder="Verification Code">#}
-            
                 <table>
                     <tr>
                         <td>{{ form.username.label_tag }}</td>
@@ -24,7 +20,7 @@
                     </tr>
                 </table>
                 
-            <button type="submit">Войти</button>
+                <button type="submit">Войти</button>
             </form>
             
             <button><a href="/signup">Зарегистрироваться</a></button>

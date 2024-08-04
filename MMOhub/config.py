@@ -1,2 +1,5 @@
 CLIENT_ID = '123'
-SECRET = '123'
+SECRET_KEY_DJANGO = 'django-insecure-t-!p@rp218$wh2r*s=+z3h3e&!wamadf7%gaw94v3ja-05if##'
+sender_mail = 'django.emailsender@yandex.ru'
+EMAIL_USER = 'django.emailsender'
+EMAIL_PASSWORD = 'laszsdjmhkuoscoe'

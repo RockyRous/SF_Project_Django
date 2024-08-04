@@ -5,8 +5,6 @@ from ckeditor.fields import RichTextField
 
 class Post(models.Model):
     """ Обьявления """
-    # При создании автор должен автоматически выставляться на пользователя. Полагаю это делается во вьёшке.
-
     tank = 'Танк'
     heal = 'Хил'
     dd = 'ДД'
@@ -37,10 +35,6 @@ class Post(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    # def preview(self):
-    #     short_text = self.text[:124] + '...'
-    #     return short_text
-    #
     def __str__(self):
         return f'({self.id}) {self.title}'
 
