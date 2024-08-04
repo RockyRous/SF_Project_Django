@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Reply
+from .models import Post, Reply, Newsletter
 
 
 class PostForm(forms.ModelForm):
@@ -30,5 +30,9 @@ class ReplyForm(forms.ModelForm):
         }
 
 
+class NewsletterForm(forms.ModelForm):
+    class Meta:
+        model = Newsletter
+        fields = ['subject', 'body']
 
 

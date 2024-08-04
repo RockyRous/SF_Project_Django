@@ -12,4 +12,5 @@ urlpatterns = [
    path('<int:pk>/delete/', PostDelete.as_view(), name='post_delete'),
    path('<int:pk>/reply_delete/', ReplyDelete.as_view(), name='reply_delete'),
    path('<int:pk>/reply_accept/', ReplyAccept.as_view(), name='reply_accept'),
+   path('newsletter', create_newsletter, name='create_newsletter'),
 ]

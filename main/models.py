@@ -57,3 +57,12 @@ class Reply(models.Model):
         return f'({self.ad.title}) {self.title}'
 
 
+class Newsletter(models.Model):
+    """ Модель для новостной рассылки """
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.subject

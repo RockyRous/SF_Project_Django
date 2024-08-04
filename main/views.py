@@ -1,5 +1,7 @@
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -7,13 +9,15 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.mail import EmailMultiAlternatives  # класс для создание объекта письма с html
 from django.template.loader import render_to_string  # функция, которая рендерит наш html в текст
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
-from .models import Post, Reply
+from .models import Post, Reply, Newsletter
 from .filters import PostFilter
-from .forms import PostForm, ReplyForm
+from .forms import PostForm, ReplyForm, NewsletterForm
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 
 def send_notification(post_author_email, post, reply_author_name):
@@ -192,7 +196,30 @@ class ReplyAccept(View):
         send_mail(subject, plain_message, from_email, [reply.author.email], html_message=html_message)
 
 
+@staff_member_required
+def create_newsletter(request):
+    if request.method == 'POST':
+        form = NewsletterForm(request.POST)
+        if form.is_valid():
+            newsletter = form.save(commit=False)
+            newsletter.sent_at = timezone.now()
+            newsletter.save()
 
+            users = User.objects.all()
+            recipient_list = [user.email for user in users if user.email]
+
+            send_mail(
+                subject=newsletter.subject,
+                message=newsletter.body,
+                from_email='django.emailsender@yandex.ru',
+                recipient_list=recipient_list,
+            )
+
+        return redirect('post_list')
+    else:
+        form = NewsletterForm()
+
+    return render(request, 'create_newsletter.html', {'form': form})
 
 
 
