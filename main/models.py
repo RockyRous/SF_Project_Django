@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
 
 
 class Post(models.Model):
@@ -30,7 +31,7 @@ class Post(models.Model):
     ]
 
     title = models.CharField(max_length=255)
-    content = models.TextField()  # todo: format text+img+video+etc
+    content = RichTextField()
     category = models.CharField(max_length=255, choices=category_list, default=heal)
     date_add = models.DateTimeField(auto_now_add=True)
 
@@ -47,7 +48,7 @@ class Post(models.Model):
 class Reply(models.Model):
     """ Отклики """
     title = models.CharField(max_length=255)
-    content = models.TextField()  # todo: format text+img+video+etc
+    content = RichTextField()
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     ad = models.ForeignKey(Post, on_delete=models.CASCADE)

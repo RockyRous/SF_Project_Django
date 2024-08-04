@@ -1,0 +1,53 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+Отклики на ваши объявления
+{% endblock title %}
+
+{% block content %}
+<div class="content">
+
+    <form method="get" action="{% url 'reply_list' %}">
+        <label for="post">Выберите объявление:</label>
+        <select name="post" id="post">
+            <option value="">Все объявления</option>
+            {% for post in posts %}
+                <option value="{{ post.id }}" {% if post.id|stringformat:"s" == selected_post %}selected{% endif %}>
+                    {{ post.title }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Фильтровать</button>
+    </form>
+
+    {% if reply %}
+    
+        <div class="ads-list">
+            {% for one_reply in reply %}
+                {% if one_reply.ad.author == user %}
+                
+                    <div class="ad-item">
+                        <h2><a href="{% url 'post_detail' one_reply.ad.id %}">{{ one_reply.title }}</a></h2>
+                        <p>{{ one_reply.content|safe }}</p>
+                        
+                        <form method="post" action="{% url 'reply_accept' one_reply.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Вы уверены, что хотите принять этот отклик?')">Принять отклик</button>
+                        </form>
+                        
+                        <form method="post" action="{% url 'reply_delete' one_reply.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Вы уверены, что хотите отклонить этот отклик?')">Отклонить</button>
+                        </form>
+
+                    </div>
+            
+                {% endif %}             
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Нет откликов</p>
+    {% endif %}
+
+</div>
+{% endblock content %}

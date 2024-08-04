@@ -17,6 +17,7 @@
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'post_edit' %}">Добавить объявление</a></li>
                     <li><a href="{% url 'my_post_list' %}">Мои объявления</a></li>
+                    <li><a href="{% url 'reply_list' %}">Отклики на мои объявления</a></li>
                     <li><a href="{% url 'logout' %}">Выйти</a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Авторизоваться</a></li>

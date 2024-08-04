@@ -14,11 +14,17 @@
                 
                 
                 <div class="ad-item">
-                    <h2><a href="{{ one_post.id }}">{{ one_post.title }}</a></h2>
-                    <p>{{ one_post.content }}</p>
-                    <button>Посмотреть</button>
-                    <button>Откликнуться</button>
-                    <span>Откликов: 3</span>
+                    <h2><a href="{% url 'post_detail' one_post.id %}">{{ one_post.title }}</a></h2>
+                    <p>{{ one_post.content|safe }}</p>
+                    
+                    <button onclick="location.href='{% url 'post_detail' one_post.id %}'">Посмотреть</button>
+                    {% if one_post.author != user %}
+                        <button onclick="location.href='{% url 'post_detail' one_post.id %}'">Откликнуться</button>
+                    {% else %}
+                        <button onclick="location.href='{% url 'post_detail' one_post.id %}'">Просмотреть отклики</button>
+                    {% endif %}
+    
+                    <span>Откликов: {{ one_post.reply_count }}</span>
                 </div>
                 
                 

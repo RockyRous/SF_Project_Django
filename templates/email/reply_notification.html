@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Новый отклик</title>
+</head>
+<body>
+    <div class="email-container">
+        <p>Здравствуйте!</p>
+        <p>Вы получили новый отклик на ваш пост "<a href="http://127.0.0.1:8000/{{ post.id }}">{{ post.title }}</a>" от {{ reply_author_name }}.</p>
+        <p>Перейдите по ссылке, чтобы просмотреть отклик.</p>
+        <a href="http://127.0.0.1:8000/{{ post.id }}">Перейти</a>
+    </div>
+</body>
+</html>

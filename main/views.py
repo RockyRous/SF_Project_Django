@@ -8,39 +8,24 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.core.mail import EmailMultiAlternatives  # класс для создание объекта письма с html
 from django.template.loader import render_to_string  # функция, которая рендерит наш html в текст
 from django.shortcuts import get_object_or_404, redirect
-
+from django.db.models import Count
 from .models import Post, Reply
 from .filters import PostFilter
-from .forms import PostForm
+from .forms import PostForm, ReplyForm
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
 
 
-class PostList(ListView):
-    model = Post
-    ordering = '-date_add'
-    template_name = 'post_list.html'
-    context_object_name = 'post'
-    paginate_by = 10
+def send_notification(post_author_email, post, reply_author_name):
+    subject = f'Новый отклик на ваш пост: {post.title}'
+    html_message = render_to_string('email/reply_notification.html', {
+        'post': post,
+        'reply_author_name': reply_author_name,
+    })
+    plain_message = strip_tags(html_message)
+    from_email = 'django.emailsender@yandex.ru'
+    send_mail(subject, plain_message, from_email, [post_author_email], html_message=html_message)
 
-
-class UserPostList(LoginRequiredMixin, ListView):
-    model = Post
-    ordering = '-date_add'
-    template_name = 'user_post_list.html'
-    context_object_name = 'post'
-    paginate_by = 10
-
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user)
-
-
-class PostDetail(DetailView):
-    model = Post
-    template_name = 'post_detail.html'
-    context_object_name = 'post'
-
-
-
-# def send_post_notification(post, subscribers):
 #     """ Рассылка на почту """
 #     for user in subscribers:
 #         # Получаем наш html с учетом пользователя
@@ -62,6 +47,57 @@ class PostDetail(DetailView):
 #         msg.attach_alternative(html_content, "text/html")  # добавляем html
 #         print(f'DEBUG: Sended email - {user.email}')
 #         msg.send()  # отсылаем
+
+
+class PostList(ListView):
+    model = Post
+    ordering = '-date_add'
+    template_name = 'post_list.html'
+    context_object_name = 'post'
+
+    def get_queryset(self):
+        return Post.objects.annotate(reply_count=Count('reply'))
+
+
+class ReplyList(ListView):
+    model = Reply
+    template_name = 'reply_list.html'
+    context_object_name = 'reply'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        post_id = self.request.GET.get('post')
+        if post_id:
+            queryset = queryset.filter(ad_id=post_id)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['posts'] = Post.objects.filter(author=self.request.user)
+        context['selected_post'] = self.request.GET.get('post')
+        return context
+
+
+class UserPostList(LoginRequiredMixin, ListView):
+    model = Post
+    ordering = '-date_add'
+    template_name = 'post_list.html'
+    context_object_name = 'post'
+    # paginate_by = 10
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user).annotate(reply_count=Count('reply'))
+
+
+class PostDetail(DetailView):
+    model = Post
+    template_name = 'post_detail.html'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['replies'] = Reply.objects.filter(ad=self.object)
+        return context
 
 
 class PostCreate(LoginRequiredMixin, CreateView):
@@ -93,26 +129,67 @@ class PostCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class PostUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    permission_required = ('post.change_post')
+class ReplyCreate(LoginRequiredMixin, CreateView):
+    form_class = ReplyForm
+    model = Reply
+    template_name = 'post_detail.html'
+    # success_url = reverse_lazy('post_list')
 
+    def form_valid(self, form):
+        reply = form.save(commit=False)
+        reply.author = self.request.user
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        reply.ad = post
+        reply.save()
+
+        send_notification(
+            post_author_email=post.author.email,
+            post=post,
+            reply_author_name=self.request.user.username
+        )
+
+        return redirect('post_detail', pk=self.kwargs['pk'])
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+class PostUpdate(LoginRequiredMixin, UpdateView):
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
     success_url = reverse_lazy('post_list')
 
 
-class PostDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    permission_required = ('post.delete_post')
-
+class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
 
 
+class ReplyDelete(LoginRequiredMixin, DeleteView):
+    model = Reply
+    template_name = 'reply_delete.html'
+    success_url = reverse_lazy('reply_list')
 
 
+class ReplyAccept(View):
+    def post(self, request, *args, **kwargs):
+        reply = get_object_or_404(Reply, id=self.kwargs['pk'])
 
+        self.send_acceptance_email(reply)
+
+        return redirect('reply_list')
+
+    def send_acceptance_email(self, reply):
+        subject = f'Ваш отклик принят: {reply.title}'
+        html_message = render_to_string('email/acceptance_notification.html', {
+            'post_title': reply.ad.title,
+            'reply_title': reply.title,
+        })
+        plain_message = strip_tags(html_message)
+        from_email = 'django.emailsender@yandex.ru'
+        send_mail(subject, plain_message, from_email, [reply.author.email], html_message=html_message)
 
 
 

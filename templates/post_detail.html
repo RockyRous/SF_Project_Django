@@ -9,7 +9,7 @@
     <div class="ads-list">
         <div class="ad-detail">
             <h1>{{ post.title }}</h1>
-            <p>{{ post.content }}</p>
+            <p>{{ post.content|safe }}</p>
             <p>Категория публикации: {{ post.category }}</p>
         
             <p>Автор: {{ post.author }}</p>
@@ -17,26 +17,55 @@
             
         </div>
     
-        <div class="ad-detail">
-            {% if post.author == user %}
-                <a href="{{ post.id }}/delete">delete</a>
-                <a href="{{ post.id }}/edit">update</a>
+        
+        {% if post.author == user %}
+            <div class="ad-detail">
+
+                <form method="post" action="{% url 'post_delete' post.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить это объявление?')">Удалить</button>
+                </form>
+                
+                <a href="{{ post.id }}/edit">Редактировать объявление</a>
+            </div>
             
-            {% else %}
-                <form action="/reply" method="post">
-                    <textarea name="reply" placeholder="Напишите ваш отклик" required></textarea>
+            <h3>Отклики</h3>
+            {% for reply in replies %}
+                
+                <div class="ad-detail">
+                    <h3>{{ reply.title }}</h3>
+                    <p>Автор отклика: {{ reply.author }}</p>
+                    <p>{{ reply.content|safe }}</p>
+                    
+                    <form method="post" action="{% url 'reply_accept' reply.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Вы уверены, что хотите принять этот отклик?')">Принять отклик</button>
+                    </form>
+                    
+                    <form method="post" action="{% url 'reply_delete' reply.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Вы уверены, что хотите отклонить этот отклик?')">Отклонить</button>
+                    </form>
+
+                </div>
+                
+            {% empty %}
+                <p>Нет откликов</p>
+            {% endfor %}
+            
+        {% else %}
+            <div class="ad-detail">
+                <form action="{% url 'post_reply' post.pk %}" method="post">
+                    {% csrf_token %}
+                    <textarea name="title" placeholder="Заголовок отклика" required></textarea>
+                    <textarea name="content" placeholder="Напишите ваш отклик" required></textarea>
                     <button type="submit">Отправить отклик</button>
                 </form>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
+
     </div>
 </div>
-
-
-<tr>
     
-    
-   <td><a href="/news/">back</a></td>
-</tr>
 {% endblock content %}
 

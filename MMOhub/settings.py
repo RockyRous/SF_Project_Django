@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
+    'ckeditor',
+    'ckeditor_uploader',
+
     'main',
 ]
 
@@ -82,6 +85,10 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 
 LOGIN_URL = '/accounts/login/'
