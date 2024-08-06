@@ -86,7 +86,7 @@ STATICFILES_DIRS = [
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
 ACCOUNT_EMAIL_REQUIRED = True

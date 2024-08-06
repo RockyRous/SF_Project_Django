@@ -6,7 +6,7 @@
         <h1>Создать объявление</h1>
         <form action="" method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.as_p }}{{ form.media }}
             <input type="submit" value="Save" />
         </form>
     </div>
